@@ -1,0 +1,9 @@
+There are 10 battlefields, numbered 1, 2, 3, ... , 10, and worth 1, 2, 3, ... , 
+10 points respectively. You have 100 fighters, which you can allocate between 
+the battlefields however you wish. Your opponents also (independently) do the same.
+
+rule set: to win a castle, you must have strictly more troops on the castle 
+than your opponent. if there is a tie, you split the points.
+
+please only enter integers in the interval [0, 100] into the castle fields. 
+if you enter in other input or your troop numbers add up to > 100, you will score 0 for every round.
