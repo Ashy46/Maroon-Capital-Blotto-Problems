@@ -2,7 +2,6 @@
 
 def hill_climbing():
     
-
 def rebalance(setUp):
     total_troops = sum(setUp)
 
