@@ -2,7 +2,11 @@ import numpy as np
 import random
 
 # Setup variables
-selectionHand = [0, 0, 0, 0, 12, 0, 24, 28, 36, 0]
+selectionHand = [
+    [3, 5, 6, 9, 0, 0, 0, 33, 0, 44], # Goal of trying to get 8 a lot of times
+    [0, 0, 0, 0, 12, 0, 24, 28, 38, 0], # Trynna get 29
+    [4, 5, 8, 10, 12, 2, 24, 33, 1, 1],
+]
 battlefields = 10
 population_size = 50
 generations = 500
@@ -53,18 +57,22 @@ def rebalance(setUp):
 
 # Fitness function: higher is better
 def fitness(currentHand):
-    hand1 = 0
-    hand2 = 0
-    for idx in range(battlefields):
-        if currentHand[idx] > selectionHand[idx]:
-            hand1 += idx + 1
-        elif currentHand[idx] < selectionHand[idx]:
-            hand2 += idx + 1
-        else:
-            hand1 += (idx + 1) / 2
-            hand2 += (idx + 1) / 2
+    total = 0
+    fitIdx = np.random.randint(0, 3)
+    for fitIdx in range(len(selectionHand)):
+        hand1 = 0
+        hand2 = 0
+        for idx in range(battlefields):
+            if currentHand[idx] > selectionHand[fitIdx][idx]:
+                hand1 += idx + 1
+            elif currentHand[idx] < selectionHand[fitIdx][idx]:
+                hand2 += idx + 1
+            else:
+                hand1 += (idx + 1) / 2
+                hand2 += (idx + 1) / 2
+        total += hand1
     
-    return hand1
+    return total/len(selectionHand)
 
 def selection(population):
 
