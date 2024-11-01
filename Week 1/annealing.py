@@ -6,7 +6,7 @@ solution = [4, 5, 8, 10, 12, 1, 24, 34, 1, 1]
 best_allocation = solution
 def_temperature = 90
 COOLING_RATE = 0.98
-max_iterations = 1000
+max_iterations = 100
 
 
 def simulated_annealing(init_solution, max_iter, temperature):
