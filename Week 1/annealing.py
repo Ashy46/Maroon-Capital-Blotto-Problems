@@ -86,7 +86,7 @@ def calculate_score(currentHand, opponentHand):
     return hand1
 
 def generate_random_hand():
-    hand = np.random.randint(0, 101, size=10)
+    hand = np.random.randint(0, 41, battlefields)
     return rebalance(hand)
 
 def compare_against_random_opponents(best_allocation, num_opponents=1000):

@@ -5,11 +5,12 @@ import random
 selectionHand = [
     [3, 5, 6, 9, 0, 0, 0, 33, 0, 44], # Goal of trying to get 8 a lot of times
     [0, 0, 0, 0, 12, 0, 24, 28, 38, 0], # Trynna get 29
-    [4, 5, 8, 10, 12, 2, 24, 33, 1, 1],
+    [4, 5, 8, 10, 12, 1, 24, 34, 1, 1],
+    [4, 5, 8, 12, 15, 19, 3, 33, 1, 0]
 ]
 battlefields = 10
 population_size = 50
-generations = 500
+generations = 1000
 max_Troops = 100
 mutation_rate = 0.1
 
@@ -132,7 +133,7 @@ def calculate_score(currentHand, opponentHand):
     return hand1
 
 def generate_random_hand():
-    hand = np.random.randint(0, max_Troops + 1, battlefields)
+    hand = np.random.randint(0, 41, battlefields)
     return rebalance(hand)
 
 def compare_against_random_opponents(best_allocation, num_opponents=100000):
@@ -146,7 +147,7 @@ def compare_against_random_opponents(best_allocation, num_opponents=100000):
     avg_score = total_score / num_opponents
     return avg_score
 # Run the genetic algorithm
-best_allocation = genetic_algorithm()
+best_allocation = [4, 5, 8, 12, 15, 19, 3, 33, 1, 0]
 
 # Display results
 print("Best Soldier Allocation: ", best_allocation)
