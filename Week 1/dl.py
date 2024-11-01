@@ -15,21 +15,21 @@ class BlottoEnv:
         self.state = np.zeros(self.num_battlefields, dtype=np.int32)
         return self.state
 
-    def rebalance(setUp):
+    def rebalance(self, setUp):
         total_troops = sum(setUp)
 
         # If troops exceed max_Troops, remove troops randomly from positive indices
-        while total_troops > max_Troops:
+        while total_troops > self.max_troops:
             positive_indices = np.where(np.array(setUp) > 0)[0]  # Find indices with more than 0 troops
             if len(positive_indices) > 0:
                 remove_from = np.random.choice(positive_indices)
-            setUp[remove_from] -= 1
-            total_troops -= 1
+                setUp[remove_from] -= 1
+                total_troops -= 1
             else:
                 break  # Safety check, but this case shouldn't occur
 
         # If troops are less than max_Troops, add troops randomly to any index
-        while total_troops < max_Troops:
+        while total_troops < self.max_troops:
             add_to = np.random.randint(len(setUp))  # Randomly select any index to add a troop
             setUp[add_to] += 1
             total_troops += 1
@@ -38,8 +38,8 @@ class BlottoEnv:
 
     def step(self, allocation):
         # Generate a random opponent allocation
-        opponent_allocation = np.random.randint(0, 41, size=self.num_battlefields)
-        opponent_allocation = rebalance(opponent_allocation)
+        opponent_allocation = [4, 5, 8, 10, 12, 1, 24, 34, 1, 1]
+        opponent_allocation = self.rebalance(opponent_allocation)
         # Calculate the reward (player's score) using the new scoring logic
         reward = self.calculate_reward(allocation, opponent_allocation)
         return reward, opponent_allocation
