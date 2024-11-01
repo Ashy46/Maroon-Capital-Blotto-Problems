@@ -47,7 +47,7 @@ def mutate(setUp):
     mutation_index = np.random.randint(10)
         
     # Calculate the maximum possible troop number that can be allocated to the mutation index
-    max_allocation = np.random.randint(0, 7)
+    max_allocation = np.random.randint(0, 4)
 
     setUp[mutation_index] += max_allocation    
         
@@ -86,7 +86,7 @@ def calculate_score(currentHand, opponentHand):
     return hand1
 
 def generate_random_hand():
-    hand = np.random.randint(0, 41, battlefields)
+    hand = np.random.randint(0, 41, 10)
     return rebalance(hand)
 
 def compare_against_random_opponents(best_allocation, num_opponents=1000):

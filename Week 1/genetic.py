@@ -147,7 +147,7 @@ def compare_against_random_opponents(best_allocation, num_opponents=100000):
     avg_score = total_score / num_opponents
     return avg_score
 # Run the genetic algorithm
-best_allocation = [4, 5, 8, 12, 15, 19, 3, 33, 1, 0]
+best_allocation = genetic_algorithm
 
 # Display results
 print("Best Soldier Allocation: ", best_allocation)
