@@ -3,13 +3,15 @@ import random
 
 # Setup variables
 selectionHand = [
-    [3, 5, 6, 9, 0, 0, 0, 33, 0, 44], # Goal of trying to get 8 a lot of times
     [0, 0, 0, 0, 12, 0, 24, 28, 38, 0], # Trynna get 29
     [4, 5, 8, 10, 12, 1, 24, 34, 1, 1],
-    [4, 5, 8, 12, 15, 19, 3, 33, 1, 0]
+    [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+    [1, 1, 1, 1, 15, 1, 24, 34, 11, 11],
+    [1, 1, 1, 1, 15, 1, 24, 34, 1, 21],
+    [4, 5, 8, 11, 15, 21, 24, 9, 2, 1]
 ]
 battlefields = 10
-population_size = 50
+population_size = 100
 generations = 1000
 max_Troops = 100
 mutation_rate = 0.1
@@ -59,19 +61,8 @@ def rebalance(setUp):
 # Fitness function: higher is better
 def fitness(currentHand):
     total = 0
-    fitIdx = np.random.randint(0, 3)
-    for fitIdx in range(len(selectionHand)):
-        hand1 = 0
-        hand2 = 0
-        for idx in range(battlefields):
-            if currentHand[idx] > selectionHand[fitIdx][idx]:
-                hand1 += idx + 1
-            elif currentHand[idx] < selectionHand[fitIdx][idx]:
-                hand2 += idx + 1
-            else:
-                hand1 += (idx + 1) / 2
-                hand2 += (idx + 1) / 2
-        total += hand1
+    for idx in range(len(selectionHand)):
+        total += calculate_score(currentHand, selectionHand[idx])
     
     return total/len(selectionHand)
 
@@ -147,7 +138,7 @@ def compare_against_random_opponents(best_allocation, num_opponents=100000):
     avg_score = total_score / num_opponents
     return avg_score
 # Run the genetic algorithm
-best_allocation = genetic_algorithm
+best_allocation = genetic_algorithm()
 
 # Display results
 print("Best Soldier Allocation: ", best_allocation)

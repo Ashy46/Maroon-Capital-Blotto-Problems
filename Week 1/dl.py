@@ -3,7 +3,6 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
-from torch.distributions import Categorical
 
 class BlottoEnv:
     def __init__(self, num_battlefields=10, max_troops=100):
@@ -26,11 +25,11 @@ class BlottoEnv:
                 setUp[remove_from] -= 1
                 total_troops -= 1
             else:
-                break  # Safety check, but this case shouldn't occur
+                break
 
         # If troops are less than max_Troops, add troops randomly to any index
         while total_troops < self.max_troops:
-            add_to = np.random.randint(len(setUp))  # Randomly select any index to add a troop
+            add_to = np.random.randint(len(setUp))
             setUp[add_to] += 1
             total_troops += 1
 
@@ -40,7 +39,6 @@ class BlottoEnv:
         # Generate a random opponent allocation
         opponent_allocation = [4, 5, 8, 10, 12, 1, 24, 34, 1, 1]
         opponent_allocation = self.rebalance(opponent_allocation)
-        # Calculate the reward (player's score) using the new scoring logic
         reward = self.calculate_reward(allocation, opponent_allocation)
         return reward, opponent_allocation
 
@@ -48,7 +46,6 @@ class BlottoEnv:
         hand1 = 0  # player score
         hand2 = 0  # opponent score
 
-        # Calculate scores based on allocation comparison
         for idx in range(self.num_battlefields):
             if currentHand[idx] > opponentHand[idx]:
                 hand1 += idx + 1
@@ -58,7 +55,6 @@ class BlottoEnv:
                 hand1 += (idx + 1) / 2
                 hand2 += (idx + 1) / 2
 
-        # Return the player's score as the reward
         return hand1
 
 class PolicyNetwork(nn.Module):
@@ -69,30 +65,77 @@ class PolicyNetwork(nn.Module):
 
     def forward(self, x):
         x = F.relu(self.fc1(x))
-        x = F.softmax(self.fc2(x), dim=-1) * 100  # Ensures outputs sum close to max_troops
+        x = F.softmax(self.fc2(x), dim=-1) * 100  # Ensures outputs are scaled
         return x
+
+def integer_allocation(allocation, max_troops):
+    # Round allocations and ensure they sum to max_troops
+    rounded_allocation = np.round(allocation).astype(int)
+    rounded_allocation = env.rebalance(rounded_allocation)
+    return rounded_allocation
+
+def allocate_troops(raw_allocations, max_troops):
+    # Apply a softmax to get probabilities and scale to max_troops
+    allocations = np.exp(raw_allocations)  # Using exp to convert logits to probabilities
+    allocations /= np.sum(allocations)      # Normalize
+    allocations *= max_troops               # Scale to max_troops
+    
+    # Round to integers and ensure sum is max_troops
+    allocations = np.round(allocations).astype(int)
+
+    # Rebalance to ensure it meets the maximum troop requirement
+    total_troops = allocations.sum()
+    if total_troops > max_troops:
+        while total_troops > max_troops:
+            # Reduce allocation randomly
+            index = np.random.choice(np.where(allocations > 0)[0])
+            allocations[index] -= 1
+            total_troops -= 1
+    elif total_troops < max_troops:
+        while total_troops < max_troops:
+            # Increase allocation randomly
+            index = np.random.choice(len(allocations))
+            allocations[index] += 1
+            total_troops += 1
+
+    return allocations
+
 
 def train(env, policy_net, optimizer, num_episodes=1000):
     for episode in range(num_episodes):
+        best_allocation = None
+        best_reward = float('-inf')
         state = torch.FloatTensor(env.reset())
         optimizer.zero_grad()
-        
-        # Get allocation distribution (action probabilities)
-        allocations = policy_net(state)
-        allocations = allocations / allocations.sum() * env.max_troops  # Normalize to max_troops
+
+        # Get raw allocation distribution (logits)
+        raw_allocations = policy_net(state)
+
+        # Convert raw allocations to troop allocations
+        allocations = allocate_troops(raw_allocations.detach().numpy(), env.max_troops)
+
+        # Convert allocations to a tensor for reward calculation
+        allocations_tensor = torch.FloatTensor(allocations)
 
         # Get reward
-        reward, opponent_allocation = env.step(allocations.detach().numpy())
-        
-        # Calculate the loss (negative reward times log-probability)
-        loss = -torch.sum(torch.log(allocations) * reward)
+        reward, opponent_allocation = env.step(allocations)
+
+        # Calculate the loss (negative reward)
+        # Use raw allocations for calculating the loss
+        loss = -torch.sum(torch.log(raw_allocations + 1e-10) * reward)  # Avoid log(0)
         loss.backward()
         optimizer.step()
 
+        if reward > best_reward:
+            best_reward = reward
+            best_allocation = allocations
+
         if episode % 100 == 0:
             print(f'Episode {episode}: Reward = {reward}, Opponent Allocation = {opponent_allocation}')
-
+    
+    print("Best Allocation:", best_allocation)
     print("Training complete.")
+
 
 # Initialize environment, policy, and optimizer
 num_battlefields = 10
@@ -106,15 +149,25 @@ train(env, policy_net, optimizer)
 
 def evaluate(env, policy_net, num_games=500):
     total_reward = 0
+    best_allocation = None
+    best_reward = float('-inf')
+
     for _ in range(num_games):
         state = torch.FloatTensor(env.reset())
         allocations = policy_net(state).detach().numpy()
-        allocations = allocations / allocations.sum() * env.max_troops
-        reward, _ = env.step(allocations)
+        integer_allocations = integer_allocation(allocations, env.max_troops)
+        reward, _ = env.step(integer_allocations)
+
         total_reward += reward
+        
+        # Track the best allocation during evaluation
+        if reward > best_reward:
+            best_reward = reward
+            best_allocation = integer_allocations
 
     avg_reward = total_reward / num_games
     print(f'Average Reward after evaluation: {avg_reward}')
+    print("Best Allocation during evaluation:", best_allocation)
+    print("Best Reward during evaluation:", best_reward)
 
 evaluate(env, policy_net)
-
