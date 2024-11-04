@@ -8,11 +8,20 @@ selectionHand = [
     [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
     [1, 1, 1, 1, 15, 1, 24, 34, 11, 11],
     [1, 1, 1, 1, 15, 1, 24, 34, 1, 21],
-    [4, 5, 8, 11, 15, 21, 24, 9, 2, 1]
+    [4, 5, 8, 11, 15, 21, 24, 9, 2, 1],
+    [2, 3, 9, 2, 2, 2, 23, 27, 27, 3],
+    [2, 2, 2, 2, 13, 15, 17, 20, 25, 2],
+    [0, 1, 1, 2, 2, 3, 19, 22, 24, 26],
+    [1, 1, 4, 4, 12, 0, 22, 22, 22, 12],
+    [2, 2, 2, 2, 10, 23, 24, 23, 10, 2],
+    [0, 1, 1, 1, 1, 22, 22, 22, 30, 0],
+    [2, 2, 2, 2, 2, 2, 25, 27, 0, 36],
+    [0, 5, 0, 13, 16, 19, 22, 0, 25, 0]
+
 ]
 battlefields = 10
 population_size = 100
-generations = 1000
+generations = 500
 max_Troops = 100
 mutation_rate = 0.1
 
@@ -138,7 +147,7 @@ def compare_against_random_opponents(best_allocation, num_opponents=100000):
     avg_score = total_score / num_opponents
     return avg_score
 # Run the genetic algorithm
-best_allocation = genetic_algorithm()
+best_allocation = [1, 3, 1, 1, 13, 2, 25, 32, 11, 11]
 
 # Display results
 print("Best Soldier Allocation: ", best_allocation)
