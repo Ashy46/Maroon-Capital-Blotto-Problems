@@ -3,20 +3,11 @@ import random
 
 # Setup variables
 selectionHand = [
-    [0, 0, 0, 0, 12, 0, 24, 28, 38, 0], # Trynna get 29
-    [4, 5, 8, 10, 12, 1, 24, 34, 1, 1],
-    [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
-    [1, 1, 1, 1, 15, 1, 24, 34, 11, 11],
-    [1, 1, 1, 1, 15, 1, 24, 34, 1, 21],
-    [4, 5, 8, 11, 15, 21, 24, 9, 2, 1],
-    [2, 3, 9, 2, 2, 2, 23, 27, 27, 3],
-    [2, 2, 2, 2, 13, 15, 17, 20, 25, 2],
-    [0, 1, 1, 2, 2, 3, 19, 22, 24, 26],
-    [1, 1, 4, 4, 12, 0, 22, 22, 22, 12],
-    [2, 2, 2, 2, 10, 23, 24, 23, 10, 2],
-    [0, 1, 1, 1, 1, 22, 22, 22, 30, 0],
-    [2, 2, 2, 2, 2, 2, 25, 27, 0, 36],
-    [0, 5, 0, 13, 16, 19, 22, 0, 25, 0]
+        [1, 1, 1, 3, 5, 8, 12, 14, 23, 32],
+        [10, 10, 10, 10, 10, 10, 10, 10, 10, 10],
+        [4, 6, 8, 9, 10, 11, 12, 13, 13, 14],
+        [0, 0, 0, 1, 11, 12, 13, 15, 24, 24],
+        [0, 1, 2, 2, 2, 13, 14, 16, 25, 25]
 
 ]
 battlefields = 10
@@ -65,6 +56,7 @@ def rebalance(setUp):
         setUp[add_to] += 1
         total_troops += 1
 
+    setUp.sort()
     return setUp
 
 # Fitness function: higher is better
@@ -93,12 +85,15 @@ def selection(population):
 
 # Populate the initial population
 def populate(size):
-    return np.random.randint(0, max_Troops + 1, (size, battlefields))
+    population = np.random.randint(0, max_Troops + 1, (size, battlefields))
+    for idx in range(len(population)):
+        population[idx] = rebalance(population[idx])
+    return population
 
 # Genetic Algorithm
 def genetic_algorithm():
     population = populate(population_size)
-    
+
     for gen in range(generations):
         population = selection(population)
         next_gen = []
